@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useApp } from '@/lib/context';
 import { Navigation } from '@/components/Navigation';
 import { storage } from '@/lib/storage';
-import { calculateCompletionRate, calculateSectionCompletionRate } from '@/lib/utils';
+import { calculateCompletionRate, calculateSectionCompletionRate, calculateDailyScore } from '@/lib/utils';
 import { DailyEntry } from '@/lib/types';
 
 export default function StatsPage() {
@@ -76,6 +76,36 @@ export default function StatsPage() {
             </div>
           </div>
 
+          {/* 14-Day History */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Ultimele 14 zile</h2>
+            {entries.length === 0 ? (
+              <p className="text-sm text-gray-500 dark:text-gray-400">Istoricul se va popula pe măsură ce închei zile.</p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {entries.slice(0, 14).map((entry) => {
+                  const score = calculateDailyScore(entry, template);
+                  const scorePercent = Math.round(score * 100);
+                  return (
+                    <div
+                      key={entry.date}
+                      className={`px-3 py-2 rounded-xl text-sm border ${
+                        score >= 0.8
+                          ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-300 dark:border-emerald-700'
+                          : score >= 0.5
+                          ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-300 dark:border-amber-700'
+                          : 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700'
+                      }`}
+                    >
+                      <span className="font-mono text-gray-900 dark:text-gray-100">{entry.date}</span>{' '}
+                      <span className="font-semibold text-gray-900 dark:text-gray-100">{scorePercent}%</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
           {/* Section Completion */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t.stats.sectionCompletion}</h2>
@@ -97,7 +127,9 @@ export default function StatsPage() {
                             ? 'bg-blue-500'
                             : section.name === 'Dietă'
                             ? 'bg-green-500'
-                            : 'bg-purple-500'
+                            : section.name === 'Medicație'
+                            ? 'bg-purple-500'
+                            : 'bg-orange-500'
                         }`}
                         style={{ width: `${rate30}%` }}
                       />

@@ -1,6 +1,7 @@
 import { AppData, DailyEntry, User, ChecklistTemplate, Streak } from './types';
 import { DEFAULT_TEMPLATE, DEFAULT_USER } from './defaults';
 import { cloudStorage } from './cloudStorage';
+import { calculateDailyScore } from './utils';
 
 const STORAGE_KEY = 'triglycoach-data';
 
@@ -160,8 +161,10 @@ export const storage = {
       return { current: 0, longest: 0 };
     }
 
+    const template = this.getTemplate();
+
     const sortedEntries = [...entries]
-      .filter((e) => e.dayComplete)
+      .filter((e) => calculateDailyScore(e, template) >= 0.8) // 80% threshold
       .sort((a, b) => b.date.localeCompare(a.date));
 
     if (sortedEntries.length === 0) {
