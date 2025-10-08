@@ -1,103 +1,182 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+import { useEffect, useState } from 'react';
+import { useApp } from '@/lib/context';
+import { Navigation } from '@/components/Navigation';
+import { getTodayDateString, createEmptyEntry, checkSectionComplete, checkDayComplete } from '@/lib/utils';
+import { DailyEntry } from '@/lib/types';
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+export default function TodayPage() {
+  const { template, todayEntry, updateTodayEntry, t, locale, user, updateUser } = useApp();
+  const [entry, setEntry] = useState<DailyEntry | null>(todayEntry);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+
+  useEffect(() => {
+    if (!user.disclaimerAccepted) {
+      setShowDisclaimer(true);
+    }
+
+    const today = getTodayDateString();
+    if (!todayEntry) {
+      const newEntry = createEmptyEntry(today, template);
+      setEntry(newEntry);
+      updateTodayEntry(newEntry);
+    } else {
+      setEntry(todayEntry);
+    }
+  }, [todayEntry, template, user.disclaimerAccepted, updateTodayEntry]);
+
+  const handleToggleItem = (sectionName: string, itemId: string) => {
+    if (!entry) return;
+
+    const newEntry = { ...entry };
+    const section = newEntry.sections.find((s) => s.sectionName === sectionName);
+    if (!section) return;
+
+    const item = section.items.find((i) => i.id === itemId);
+    if (!item) return;
+
+    item.checked = !item.checked;
+    item.timestamp = item.checked ? new Date().toISOString() : undefined;
+
+    section.sectionComplete = checkSectionComplete(section, template);
+
+    newEntry.dayComplete = checkDayComplete(newEntry);
+
+    setEntry(newEntry);
+    updateTodayEntry(newEntry);
+  };
+
+  const acceptDisclaimer = () => {
+    updateUser({ ...user, disclaimerAccepted: true });
+    setShowDisclaimer(false);
+  };
+
+  if (showDisclaimer) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
+          <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">{t.disclaimer.title}</h2>
+          <p className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">{t.disclaimer.content}</p>
+          <button
+            onClick={acceptDisclaimer}
+            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            {t.disclaimer.accept}
+          </button>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
+    );
+  }
+
+  if (!entry) return null;
+
+  const completedSections = entry.sections.filter((s) => s.sectionComplete).length;
+  const totalSections = entry.sections.length;
+  const progressPercent = (completedSections / totalSections) * 100;
+
+  return (
+    <div className="min-h-screen pb-20 bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-md mx-auto">
+        {/* Header */}
+        <div className="bg-white dark:bg-gray-800 shadow-sm">
+          <div className="p-6">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t.today.title}</h1>
+            <p className="text-gray-600 dark:text-gray-400">{new Date().toLocaleDateString(locale === 'ro' ? 'ro-RO' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+
+            {/* Progress Bar */}
+            <div className="mt-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {completedSections}/{totalSections} {t.today.progressLabel}
+                </span>
+                <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                  {Math.round(progressPercent)}%
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+                <div
+                  className="bg-emerald-500 h-full transition-all duration-500 ease-out rounded-full"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sections */}
+        <div className="p-4 space-y-4">
+          {entry.sections.map((section) => {
+            const templateSection = template.sections.find((s) => s.name === section.sectionName);
+            if (!templateSection) return null;
+
+            const sectionName = locale === 'ro' ? templateSection.nameRo : templateSection.name;
+
+            return (
+              <div
+                key={section.sectionName}
+                className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden"
+              >
+                <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">{sectionName}</h2>
+                  {section.sectionComplete && (
+                    <span className="text-2xl">✅</span>
+                  )}
+                </div>
+                <div className="p-4 space-y-3">
+                  {section.items.map((item) => {
+                    const templateItem = templateSection.items.find((ti) => ti.id === item.id);
+                    if (!templateItem) return null;
+
+                    const itemLabel = locale === 'ro' ? templateItem.labelRo : templateItem.label;
+
+                    return (
+                      <label
+                        key={item.id}
+                        className="flex items-start space-x-3 cursor-pointer tap-highlight-none group"
+                      >
+                        <div className="relative flex-shrink-0 mt-0.5">
+                          <input
+                            type="checkbox"
+                            checked={item.checked}
+                            onChange={() => handleToggleItem(section.sectionName, item.id)}
+                            className="w-6 h-6 rounded-md border-2 border-gray-300 dark:border-gray-600 text-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 cursor-pointer appearance-none checked:bg-emerald-500 checked:border-emerald-500"
+                          />
+                          {item.checked && (
+                            <svg
+                              className="absolute top-0 left-0 w-6 h-6 text-white pointer-events-none checkbox-bounce"
+                              fill="none"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="3"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path d="M5 13l4 4L19 7"></path>
+                            </svg>
+                          )}
+                        </div>
+                        <span className={`flex-1 text-base ${item.checked ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-700 dark:text-gray-300'} group-hover:text-gray-900 dark:group-hover:text-white transition-colors`}>
+                          {itemLabel}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* All Done Message */}
+          {entry.dayComplete && (
+            <div className="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-6 text-center shadow-lg">
+              <p className="text-2xl font-bold text-white">{t.today.allDone}</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <Navigation />
     </div>
   );
 }
