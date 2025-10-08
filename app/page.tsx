@@ -7,15 +7,10 @@ import { getTodayDateString, createEmptyEntry, checkSectionComplete, checkDayCom
 import { DailyEntry } from '@/lib/types';
 
 export default function TodayPage() {
-  const { template, todayEntry, updateTodayEntry, t, locale, user, updateUser } = useApp();
+  const { template, todayEntry, updateTodayEntry, t } = useApp();
   const [entry, setEntry] = useState<DailyEntry | null>(todayEntry);
-  const [showDisclaimer, setShowDisclaimer] = useState(false);
 
   useEffect(() => {
-    if (!user.disclaimerAccepted) {
-      setShowDisclaimer(true);
-    }
-
     const today = getTodayDateString();
     if (!todayEntry) {
       const newEntry = createEmptyEntry(today, template);
@@ -24,7 +19,7 @@ export default function TodayPage() {
     } else {
       setEntry(todayEntry);
     }
-  }, [todayEntry, template, user.disclaimerAccepted, updateTodayEntry]);
+  }, [todayEntry, template, updateTodayEntry]);
 
   const handleToggleItem = (sectionName: string, itemId: string) => {
     if (!entry) return;
@@ -47,28 +42,6 @@ export default function TodayPage() {
     updateTodayEntry(newEntry);
   };
 
-  const acceptDisclaimer = () => {
-    updateUser({ ...user, disclaimerAccepted: true });
-    setShowDisclaimer(false);
-  };
-
-  if (showDisclaimer) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
-          <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">{t.disclaimer.title}</h2>
-          <p className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">{t.disclaimer.content}</p>
-          <button
-            onClick={acceptDisclaimer}
-            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
-          >
-            {t.disclaimer.accept}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   if (!entry) return null;
 
   const completedSections = entry.sections.filter((s) => s.sectionComplete).length;
@@ -82,7 +55,7 @@ export default function TodayPage() {
         <div className="bg-white dark:bg-gray-800 shadow-sm">
           <div className="p-6">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t.today.title}</h1>
-            <p className="text-gray-600 dark:text-gray-400">{new Date().toLocaleDateString(locale === 'ro' ? 'ro-RO' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+            <p className="text-gray-600 dark:text-gray-400">{new Date().toLocaleDateString('ro-RO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
 
             {/* Progress Bar */}
             <div className="mt-4">
@@ -110,15 +83,13 @@ export default function TodayPage() {
             const templateSection = template.sections.find((s) => s.name === section.sectionName);
             if (!templateSection) return null;
 
-            const sectionName = locale === 'ro' ? templateSection.nameRo : templateSection.name;
-
             return (
               <div
                 key={section.sectionName}
                 className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden"
               >
                 <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">{sectionName}</h2>
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">{templateSection.name}</h2>
                   {section.sectionComplete && (
                     <span className="text-2xl">✅</span>
                   )}
@@ -127,8 +98,6 @@ export default function TodayPage() {
                   {section.items.map((item) => {
                     const templateItem = templateSection.items.find((ti) => ti.id === item.id);
                     if (!templateItem) return null;
-
-                    const itemLabel = locale === 'ro' ? templateItem.labelRo : templateItem.label;
 
                     return (
                       <label
@@ -157,7 +126,7 @@ export default function TodayPage() {
                           )}
                         </div>
                         <span className={`flex-1 text-base ${item.checked ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-700 dark:text-gray-300'} group-hover:text-gray-900 dark:group-hover:text-white transition-colors`}>
-                          {itemLabel}
+                          {templateItem.label}
                         </span>
                       </label>
                     );

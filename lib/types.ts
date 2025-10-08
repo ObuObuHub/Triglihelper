@@ -1,13 +1,11 @@
 export interface ChecklistItem {
   id: string;
   label: string;
-  labelRo: string;
   required: boolean;
 }
 
 export interface ChecklistSection {
   name: string;
-  nameRo: string;
   items: ChecklistItem[];
   minRequired?: number;
 }
@@ -42,9 +40,7 @@ export interface Streak {
 export interface User {
   id: string;
   name: string;
-  locale: 'en' | 'ro';
   reminderTimes: string[];
-  disclaimerAccepted: boolean;
 }
 
 export interface AuthUser {

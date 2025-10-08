@@ -7,7 +7,7 @@ import { storage } from '@/lib/storage';
 import { DailyEntry } from '@/lib/types';
 
 export default function CalendarPage() {
-  const { t, locale } = useApp();
+  const { t } = useApp();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [entries, setEntries] = useState<DailyEntry[]>([]);
   const [selectedEntry, setSelectedEntry] = useState<DailyEntry | null>(null);
@@ -51,7 +51,7 @@ export default function CalendarPage() {
   };
 
   const { daysInMonth, startingDayOfWeek, year, month } = getDaysInMonth(currentDate);
-  const monthName = currentDate.toLocaleDateString(locale === 'ro' ? 'ro-RO' : 'en-US', { month: 'long', year: 'numeric' });
+  const monthName = currentDate.toLocaleDateString('ro-RO', { month: 'long', year: 'numeric' });
 
   const days = [];
   for (let i = 0; i < startingDayOfWeek; i++) {
@@ -161,7 +161,7 @@ export default function CalendarPage() {
           <div className="p-4">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
-                {new Date(selectedEntry.date).toLocaleDateString(locale === 'ro' ? 'ro-RO' : 'en-US', {
+                {new Date(selectedEntry.date).toLocaleDateString('ro-RO', {
                   weekday: 'long',
                   year: 'numeric',
                   month: 'long',

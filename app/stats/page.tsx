@@ -87,15 +87,15 @@ export default function StatsPage() {
                 return (
                   <div key={section.name}>
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{section.nameRo}</span>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{section.name}</span>
                       <span className="text-sm font-bold text-gray-600 dark:text-gray-400">{rate30}%</span>
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
                       <div
                         className={`h-full transition-all duration-500 rounded-full ${
-                          section.name === 'Activity'
+                          section.name === 'Activitate'
                             ? 'bg-blue-500'
-                            : section.name === 'Diet'
+                            : section.name === 'Dietă'
                             ? 'bg-green-500'
                             : 'bg-purple-500'
                         }`}

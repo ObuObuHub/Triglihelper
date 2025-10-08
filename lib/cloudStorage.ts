@@ -1,36 +1,26 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 import { User, ChecklistTemplate, DailyEntry } from './types';
 
+const FIXED_USER_ID = 'fixed-user-id';
+
 export const cloudStorage = {
   async syncUser(user: User): Promise<void> {
     if (!isSupabaseConfigured() || !supabase) return;
 
-    const {
-      data: { user: authUser },
-    } = await supabase.auth.getUser();
-    if (!authUser) return;
-
     await supabase.from('profiles').upsert({
-      id: authUser.id,
+      id: FIXED_USER_ID,
       name: user.name,
-      locale: user.locale,
       reminder_times: user.reminderTimes,
-      disclaimer_accepted: user.disclaimerAccepted,
     });
   },
 
   async getUser(): Promise<User | null> {
     if (!isSupabaseConfigured() || !supabase) return null;
 
-    const {
-      data: { user: authUser },
-    } = await supabase.auth.getUser();
-    if (!authUser) return null;
-
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
-      .eq('id', authUser.id)
+      .eq('id', FIXED_USER_ID)
       .single();
 
     if (error || !data) return null;
@@ -38,22 +28,15 @@ export const cloudStorage = {
     return {
       id: data.id,
       name: data.name || '',
-      locale: data.locale || 'ro',
       reminderTimes: data.reminder_times || ['08:00', '13:00', '20:00'],
-      disclaimerAccepted: data.disclaimer_accepted || false,
     };
   },
 
   async syncTemplate(template: ChecklistTemplate): Promise<void> {
     if (!isSupabaseConfigured() || !supabase) return;
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
     await supabase.from('checklist_templates').upsert({
-      user_id: user.id,
+      user_id: FIXED_USER_ID,
       sections: template.sections,
     });
   },
@@ -61,15 +44,10 @@ export const cloudStorage = {
   async getTemplate(): Promise<ChecklistTemplate | null> {
     if (!isSupabaseConfigured() || !supabase) return null;
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return null;
-
     const { data, error } = await supabase
       .from('checklist_templates')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', FIXED_USER_ID)
       .single();
 
     if (error || !data) return null;
@@ -82,13 +60,8 @@ export const cloudStorage = {
   async syncEntry(entry: DailyEntry): Promise<void> {
     if (!isSupabaseConfigured() || !supabase) return;
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
     await supabase.from('daily_entries').upsert({
-      user_id: user.id,
+      user_id: FIXED_USER_ID,
       date: entry.date,
       sections: entry.sections,
       day_complete: entry.dayComplete,
@@ -98,15 +71,10 @@ export const cloudStorage = {
   async getEntries(): Promise<DailyEntry[]> {
     if (!isSupabaseConfigured() || !supabase) return [];
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return [];
-
     const { data, error } = await supabase
       .from('daily_entries')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', FIXED_USER_ID)
       .order('date', { ascending: false });
 
     if (error || !data) return [];
@@ -121,15 +89,10 @@ export const cloudStorage = {
   async getEntry(date: string): Promise<DailyEntry | null> {
     if (!isSupabaseConfigured() || !supabase) return null;
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return null;
-
     const { data, error } = await supabase
       .from('daily_entries')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', FIXED_USER_ID)
       .eq('date', date)
       .single();
 
@@ -145,14 +108,9 @@ export const cloudStorage = {
   async deleteAllData(): Promise<void> {
     if (!isSupabaseConfigured() || !supabase) return;
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
     await Promise.all([
-      supabase.from('daily_entries').delete().eq('user_id', user.id),
-      supabase.from('checklist_templates').delete().eq('user_id', user.id),
+      supabase.from('daily_entries').delete().eq('user_id', FIXED_USER_ID),
+      supabase.from('checklist_templates').delete().eq('user_id', FIXED_USER_ID),
     ]);
   },
 };
