@@ -114,7 +114,7 @@ export default function SettingsPage() {
 
           {/* Export/Import Data */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Export/Import Date</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Exportă/Importă Date</h2>
             <div className="flex gap-3">
               <button
                 onClick={handleExport}
@@ -151,7 +151,7 @@ export default function SettingsPage() {
           <div className="text-center text-sm text-gray-500 dark:text-gray-400 py-4">
             TriglyCoach v2.0.0
             <br />
-            Made with ❤️
+            Făcut cu ❤️
           </div>
         </div>
       </div>
