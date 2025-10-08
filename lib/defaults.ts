@@ -107,7 +107,6 @@ export const DEFAULT_TEMPLATE: ChecklistTemplate = {
 export const DEFAULT_USER: User = {
   id: 'user-1',
   name: '',
-  email: undefined,
   locale: 'ro',
   reminderTimes: ['08:00', '13:00', '20:00'],
   disclaimerAccepted: false,

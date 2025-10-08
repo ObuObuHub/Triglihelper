@@ -6,17 +6,18 @@ import { Navigation } from '@/components/Navigation';
 import { storage } from '@/lib/storage';
 
 export default function SettingsPage() {
-  const { t, user, updateUser, locale } = useApp();
+  const { t, user, updateUser, locale, authUser, signIn, signOut, syncNow, syncStatus, isSupabaseEnabled } = useApp();
   const [name, setName] = useState(user.name);
-  const [email, setEmail] = useState(user.email || '');
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [email, setEmail] = useState('');
+  const [loginMessage, setLoginMessage] = useState('');
 
   const handleSave = () => {
     updateUser({
       ...user,
       name,
-      email: email || undefined,
     });
     alert(locale === 'ro' ? 'Salvat!' : 'Saved!');
   };
@@ -28,31 +29,32 @@ export default function SettingsPage() {
     });
   };
 
-  const handleExportCSV = () => {
-    const entries = storage.getEntries();
-    const csvHeaders = 'Date,Activity,Diet,Medication,Complete\n';
-    const csvRows = entries
-      .map((entry) => {
-        const activity = entry.sections.find((s) => s.sectionName === 'Activity')?.sectionComplete ? '✓' : '✗';
-        const diet = entry.sections.find((s) => s.sectionName === 'Diet')?.sectionComplete ? '✓' : '✗';
-        const medication = entry.sections.find((s) => s.sectionName === 'Medication')?.sectionComplete ? '✓' : '✗';
-        const complete = entry.dayComplete ? '✓' : '✗';
-        return `${entry.date},${activity},${diet},${medication},${complete}`;
-      })
-      .join('\n');
+  const handleSignIn = async () => {
+    if (!email) {
+      setLoginMessage(locale === 'ro' ? 'Introdu adresa de email' : 'Enter email address');
+      return;
+    }
 
-    const csv = csvHeaders + csvRows;
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `triglycoach-export-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const { error } = await signIn(email);
+
+    if (error) {
+      setLoginMessage(error);
+    } else {
+      setLoginMessage(
+        locale === 'ro'
+          ? 'Verifică email-ul! Ți-am trimis un link de autentificare.'
+          : 'Check your email! We sent you a magic link.'
+      );
+    }
   };
 
-  const handleClearData = () => {
-    storage.clearData();
+  const handleSignOut = async () => {
+    await signOut();
+    setShowLoginModal(false);
+  };
+
+  const handleClearData = async () => {
+    await storage.clearData();
     window.location.reload();
   };
 
@@ -65,6 +67,72 @@ export default function SettingsPage() {
         </div>
 
         <div className="p-4 space-y-4">
+          {/* Cloud Sync Section */}
+          {isSupabaseEnabled && (
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                {locale === 'ro' ? 'Sincronizare Cloud' : 'Cloud Sync'}
+              </h2>
+
+              {authUser ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
+                    <div>
+                      <div className="text-sm font-medium text-emerald-900 dark:text-emerald-100">
+                        {locale === 'ro' ? 'Conectat' : 'Connected'}
+                      </div>
+                      <div className="text-xs text-emerald-700 dark:text-emerald-300">{authUser.email}</div>
+                    </div>
+                    <div className="text-2xl">✓</div>
+                  </div>
+
+                  {syncStatus.lastSyncedAt && (
+                    <div className="text-xs text-gray-600 dark:text-gray-400 text-center">
+                      {locale === 'ro' ? 'Ultima sincronizare: ' : 'Last synced: '}
+                      {new Date(syncStatus.lastSyncedAt).toLocaleTimeString(locale === 'ro' ? 'ro-RO' : 'en-US')}
+                    </div>
+                  )}
+
+                  <button
+                    onClick={syncNow}
+                    disabled={syncStatus.isSyncing}
+                    className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
+                  >
+                    {syncStatus.isSyncing
+                      ? locale === 'ro'
+                        ? 'Sincronizare...'
+                        : 'Syncing...'
+                      : locale === 'ro'
+                      ? 'Sincronizează Acum'
+                      : 'Sync Now'}
+                  </button>
+
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-semibold py-3 px-6 rounded-xl transition-colors"
+                  >
+                    {locale === 'ro' ? 'Deconectare' : 'Sign Out'}
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {locale === 'ro'
+                      ? 'Conectează-te pentru a sincroniza datele între dispozitive.'
+                      : 'Sign in to sync your data across devices.'}
+                  </p>
+
+                  <button
+                    onClick={() => setShowLoginModal(true)}
+                    className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
+                  >
+                    {locale === 'ro' ? 'Conectează-te' : 'Sign In'}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Profile */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t.settings.profile}</h2>
@@ -80,19 +148,6 @@ export default function SettingsPage() {
                   onChange={(e) => setName(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   placeholder={locale === 'ro' ? 'Numele tău' : 'Your name'}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t.settings.email}
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  placeholder="email@example.com"
                 />
               </div>
 
@@ -122,18 +177,6 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Export/Import */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t.settings.exportData}</h2>
-
-            <button
-              onClick={handleExportCSV}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
-            >
-              {t.settings.exportCSV}
-            </button>
-          </div>
-
           {/* Disclaimer */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
             <button
@@ -161,12 +204,69 @@ export default function SettingsPage() {
 
           {/* App Info */}
           <div className="text-center text-sm text-gray-500 dark:text-gray-400 py-4">
-            TriglyCoach v1.0.0
+            TriglyCoach v2.0.0
             <br />
             {locale === 'ro' ? 'Made with ❤️' : 'Făcut cu ❤️'}
           </div>
         </div>
       </div>
+
+      {/* Login Modal */}
+      {showLoginModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
+            <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+              {locale === 'ro' ? 'Conectează-te' : 'Sign In'}
+            </h2>
+
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {locale === 'ro'
+                ? 'Introduce adresa ta de email. Îți vom trimite un link magic de autentificare.'
+                : 'Enter your email address. We\'ll send you a magic link to sign in.'}
+            </p>
+
+            <div className="space-y-4">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                placeholder="email@example.com"
+              />
+
+              {loginMessage && (
+                <div
+                  className={`text-sm p-3 rounded-lg ${
+                    loginMessage.includes('email')
+                      ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300'
+                      : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
+                  }`}
+                >
+                  {loginMessage}
+                </div>
+              )}
+
+              <button
+                onClick={handleSignIn}
+                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
+              >
+                {locale === 'ro' ? 'Trimite Link' : 'Send Magic Link'}
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowLoginModal(false);
+                  setLoginMessage('');
+                  setEmail('');
+                }}
+                className="w-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-semibold py-3 px-6 rounded-xl transition-colors"
+              >
+                {t.settings.cancel}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Disclaimer Modal */}
       {showDisclaimer && (

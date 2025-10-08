@@ -1,5 +1,6 @@
 import { AppData, DailyEntry, User, ChecklistTemplate, Streak } from './types';
 import { DEFAULT_TEMPLATE, DEFAULT_USER } from './defaults';
+import { cloudStorage } from './cloudStorage';
 
 const STORAGE_KEY = 'triglycoach-data';
 
@@ -48,6 +49,13 @@ export const storage = {
     const data = this.getData();
     data.user = user;
     this.saveData(data);
+
+    // Sync to cloud
+    cloudStorage.syncUser(user).catch(console.error);
+  },
+
+  async loadUserFromCloud(): Promise<User | null> {
+    return cloudStorage.getUser();
   },
 
   getTemplate(): ChecklistTemplate {
@@ -58,6 +66,13 @@ export const storage = {
     const data = this.getData();
     data.template = template;
     this.saveData(data);
+
+    // Sync to cloud
+    cloudStorage.syncTemplate(template).catch(console.error);
+  },
+
+  async loadTemplateFromCloud(): Promise<ChecklistTemplate | null> {
+    return cloudStorage.getTemplate();
   },
 
   getEntries(): DailyEntry[] {
@@ -84,6 +99,56 @@ export const storage = {
     data.streak = this.calculateStreak(data.entries);
 
     this.saveData(data);
+
+    // Sync to cloud
+    cloudStorage.syncEntry(entry).catch(console.error);
+  },
+
+  async loadEntriesFromCloud(): Promise<DailyEntry[]> {
+    return cloudStorage.getEntries();
+  },
+
+  async syncFromCloud(): Promise<void> {
+    try {
+      const [cloudUser, cloudTemplate, cloudEntries] = await Promise.all([
+        cloudStorage.getUser(),
+        cloudStorage.getTemplate(),
+        cloudStorage.getEntries(),
+      ]);
+
+      const data = this.getData();
+
+      if (cloudUser) {
+        data.user = cloudUser;
+      }
+
+      if (cloudTemplate) {
+        data.template = cloudTemplate;
+      }
+
+      if (cloudEntries && cloudEntries.length > 0) {
+        data.entries = cloudEntries;
+        data.streak = this.calculateStreak(cloudEntries);
+      }
+
+      this.saveData(data);
+    } catch (error) {
+      console.error('Error syncing from cloud:', error);
+    }
+  },
+
+  async syncToCloud(): Promise<void> {
+    try {
+      const data = this.getData();
+
+      await Promise.all([
+        cloudStorage.syncUser(data.user),
+        cloudStorage.syncTemplate(data.template),
+        ...data.entries.map((entry) => cloudStorage.syncEntry(entry)),
+      ]);
+    } catch (error) {
+      console.error('Error syncing to cloud:', error);
+    }
   },
 
   getStreak(): Streak {
@@ -169,8 +234,11 @@ export const storage = {
     return { current, longest };
   },
 
-  clearData(): void {
+  async clearData(): Promise<void> {
     if (typeof window === 'undefined') return;
     localStorage.removeItem(STORAGE_KEY);
+
+    // Clear cloud data too
+    await cloudStorage.deleteAllData();
   },
 };

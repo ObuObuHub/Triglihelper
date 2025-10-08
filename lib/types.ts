@@ -42,10 +42,20 @@ export interface Streak {
 export interface User {
   id: string;
   name: string;
-  email?: string;
   locale: 'en' | 'ro';
   reminderTimes: string[];
   disclaimerAccepted: boolean;
+}
+
+export interface AuthUser {
+  id: string;
+  email: string;
+}
+
+export interface SyncStatus {
+  isSyncing: boolean;
+  lastSyncedAt?: Date;
+  error?: string;
 }
 
 export interface AppData {
