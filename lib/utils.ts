@@ -1,5 +1,4 @@
 import { DailyEntry, DailySection, ChecklistTemplate } from './types';
-import { DEFAULT_TARGETS } from './defaults';
 
 export function formatDate(date: Date): string {
   const year = date.getFullYear();
@@ -24,9 +23,6 @@ export function createEmptyEntry(date: string, template: ChecklistTemplate): Dai
       sectionComplete: false,
     })),
     dayComplete: false,
-    fiber: { value: 0, target: DEFAULT_TARGETS.fiber },
-    water: { value: 0, target: DEFAULT_TARGETS.water },
-    notes: '',
   };
 }
 
@@ -50,15 +46,7 @@ export function calculateDailyScore(entry: DailyEntry, template: ChecklistTempla
     return sum + section.items.filter(i => i.checked).length;
   }, 0);
 
-  // Check numeric targets (2 additional points)
-  const fiberMet = (entry.fiber?.value ?? 0) >= (entry.fiber?.target ?? DEFAULT_TARGETS.fiber) ? 1 : 0;
-  const waterMet = (entry.water?.value ?? 0) >= (entry.water?.target ?? DEFAULT_TARGETS.water) ? 1 : 0;
-
-  // Calculate score as (checked + targets met) / (total + 2)
-  const maxPoints = totalItems + 2;
-  const earnedPoints = checkedCount + fiberMet + waterMet;
-
-  return earnedPoints / maxPoints;
+  return checkedCount / totalItems;
 }
 
 export function checkDayComplete(entry: DailyEntry, template: ChecklistTemplate): boolean {

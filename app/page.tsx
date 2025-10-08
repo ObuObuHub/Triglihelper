@@ -5,7 +5,6 @@ import { useApp } from '@/lib/context';
 import { Navigation } from '@/components/Navigation';
 import { getTodayDateString, createEmptyEntry, checkSectionComplete, checkDayComplete, calculateDailyScore } from '@/lib/utils';
 import { DailyEntry } from '@/lib/types';
-import { DEFAULT_TARGETS } from '@/lib/defaults';
 
 export default function TodayPage() {
   const { template, todayEntry, updateTodayEntry, t } = useApp();
@@ -43,41 +42,10 @@ export default function TodayPage() {
     updateTodayEntry(newEntry);
   };
 
-  const handleFiberChange = (value: number) => {
-    if (!entry) return;
-    const newEntry = {
-      ...entry,
-      fiber: { value, target: entry.fiber?.target ?? DEFAULT_TARGETS.fiber },
-    };
-    newEntry.dayComplete = checkDayComplete(newEntry, template);
-    setEntry(newEntry);
-    updateTodayEntry(newEntry);
-  };
-
-  const handleWaterChange = (value: number) => {
-    if (!entry) return;
-    const newEntry = {
-      ...entry,
-      water: { value, target: entry.water?.target ?? DEFAULT_TARGETS.water },
-    };
-    newEntry.dayComplete = checkDayComplete(newEntry, template);
-    setEntry(newEntry);
-    updateTodayEntry(newEntry);
-  };
-
-  const handleNotesChange = (notes: string) => {
-    if (!entry) return;
-    const newEntry = { ...entry, notes };
-    setEntry(newEntry);
-    updateTodayEntry(newEntry);
-  };
-
   if (!entry) return null;
 
   const dailyScore = calculateDailyScore(entry, template);
   const progressPercent = Math.round(dailyScore * 100);
-  const fiberMet = (entry.fiber?.value ?? 0) >= (entry.fiber?.target ?? DEFAULT_TARGETS.fiber);
-  const waterMet = (entry.water?.value ?? 0) >= (entry.water?.target ?? DEFAULT_TARGETS.water);
 
   return (
     <div className="min-h-screen pb-20 bg-gray-50 dark:bg-gray-900">
@@ -168,65 +136,6 @@ export default function TodayPage() {
               </div>
             );
           })}
-
-          {/* Numeric Targets */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Ținte zilnice</h2>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Fibre consumate (g)
-                </label>
-                <input
-                  type="number"
-                  value={entry.fiber?.value ?? 0}
-                  onChange={(e) => handleFiberChange(parseFloat(e.target.value) || 0)}
-                  className={`w-full px-4 py-2 border rounded-xl ${
-                    fiberMet
-                      ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
-                      : 'border-gray-300 dark:border-gray-600'
-                  } bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500`}
-                  min={0}
-                  step={1}
-                />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Țintă ≥ {entry.fiber?.target ?? DEFAULT_TARGETS.fiber} g — {fiberMet ? '✓ atins' : 'în curs'}
-                </p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Apă băută (L)
-                </label>
-                <input
-                  type="number"
-                  value={entry.water?.value ?? 0}
-                  onChange={(e) => handleWaterChange(parseFloat(e.target.value) || 0)}
-                  className={`w-full px-4 py-2 border rounded-xl ${
-                    waterMet
-                      ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
-                      : 'border-gray-300 dark:border-gray-600'
-                  } bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500`}
-                  min={0}
-                  step={0.1}
-                />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Țintă ≥ {entry.water?.target ?? DEFAULT_TARGETS.water} L — {waterMet ? '✓ atins' : 'în curs'}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Notes */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Notițe</h2>
-            <textarea
-              value={entry.notes ?? ''}
-              onChange={(e) => handleNotesChange(e.target.value)}
-              rows={3}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500"
-              placeholder="Cum te-ai simțit? Observații despre mese/antrenament/medicație..."
-            />
-          </div>
 
           {/* All Done Message */}
           {entry.dayComplete && (

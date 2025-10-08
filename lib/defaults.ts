@@ -38,69 +38,73 @@ export const DEFAULT_TEMPLATE: ChecklistTemplate = {
       items: [
         {
           id: 'd1',
-          label: 'Zero băuturi îndulcite/zero sucuri de fructe',
+          label: 'Zi fără alcool',
           required: true,
         },
         {
           id: 'd2',
-          label: 'Zero făină/orez alb, zero dulciuri/produse de patiserie',
+          label: 'Zero băuturi îndulcite/sucuri',
           required: true,
         },
         {
           id: 'd3',
-          label: '≥4 porții legume',
+          label: 'Zero făină/orez alb, dulciuri',
           required: true,
         },
         {
           id: 'd4',
-          label: 'Fructe întregi ≤2 porții (nu suc)',
+          label: '≥4 porții legume',
           required: true,
         },
         {
           id: 'd5',
-          label: 'Leguminoase ≥1 porție (linte/fasole/năut)',
+          label: 'Fructe întregi ≤2 porții',
           required: true,
         },
         {
           id: 'd6',
-          label: 'Cereale integrale ≥3 porții (ovăz/orez brun/quinoa/pâine integrală)',
+          label: 'Leguminoase ≥1 porție',
           required: true,
         },
         {
           id: 'd7',
-          label: 'Nuci/semințe ≥1 porție (in/chia/nuci)',
+          label: 'Cereale integrale ≥3 porții',
           required: true,
         },
         {
           id: 'd8',
-          label: 'Pește gras astăzi SAU programat în săptămână',
+          label: 'Nuci/semințe ≥1 porție',
           required: true,
         },
         {
           id: 'd9',
-          label: 'Gătit: cuptor/abur/grătar/înăbușit (fără prăjeli)',
+          label: 'Pește gras (astăzi sau programat)',
+          required: true,
+        },
+        {
+          id: 'd10',
+          label: 'Gătit sănătos (cuptor/abur/grătar)',
+          required: true,
+        },
+        {
+          id: 'd11',
+          label: 'Fibre ≥25g',
+          required: true,
+        },
+        {
+          id: 'd12',
+          label: 'Apă ≥1.5L',
           required: true,
         },
       ],
-      minRequired: 6,
+      minRequired: 9,
     },
     {
       name: 'Medicație',
       items: [
         {
           id: 'm1',
-          label: 'Medicație conform prescripției (azi)',
-          required: true,
-        },
-      ],
-      minRequired: 1,
-    },
-    {
-      name: 'Siguranță',
-      items: [
-        {
-          id: 's1',
-          label: 'Zi fără alcool (obligatoriu dacă TG ≥500 mg/dL)',
+          label: 'Medicație conform prescripției',
           required: true,
         },
       ],
