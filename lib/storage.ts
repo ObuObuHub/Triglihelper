@@ -37,6 +37,7 @@ export const storage = {
       template: DEFAULT_TEMPLATE,
       entries: [],
       streak: { current: 0, longest: 0 },
+      unlockedAchievements: [],
     };
   },
 
@@ -133,6 +134,18 @@ export const storage = {
 
     longest = Math.max(longest, tempStreak);
     return { current, longest };
+  },
+
+  getUnlockedAchievements(): string[] {
+    return this.getData().unlockedAchievements || [];
+  },
+
+  unlockAchievement(achievementId: string): void {
+    const data = this.getData();
+    if (!data.unlockedAchievements.includes(achievementId)) {
+      data.unlockedAchievements.push(achievementId);
+      this.saveData(data);
+    }
   },
 
   clearData(): void {

@@ -5,10 +5,14 @@ import { useApp } from '@/lib/context';
 import { Navigation } from '@/components/Navigation';
 import { getTodayDateString, createEmptyEntry, checkSectionComplete, checkDayComplete, calculateDailyScore } from '@/lib/utils';
 import { DailyEntry } from '@/lib/types';
+import { storage } from '@/lib/storage';
+import { AchievementNotification } from '@/components/AchievementNotification';
+import { calculateAchievementStats, checkNewAchievements, getStreakEmoji, getStreakMilestone, ACHIEVEMENTS } from '@/lib/achievements';
 
 export default function TodayPage() {
-  const { template, todayEntry, updateTodayEntry, t } = useApp();
+  const { template, todayEntry, updateTodayEntry, t, streak } = useApp();
   const [entry, setEntry] = useState<DailyEntry | null>(null);
+  const [newAchievement, setNewAchievement] = useState<typeof ACHIEVEMENTS[0] | null>(null);
 
   useEffect(() => {
     if (todayEntry) {
@@ -38,21 +42,78 @@ export default function TodayPage() {
 
     setEntry(newEntry);
     updateTodayEntry(newEntry);
+
+    // Check for new achievements
+    const entries = storage.getEntries();
+    const streakData = storage.getStreak();
+    const stats = calculateAchievementStats(entries, template, streakData.current, streakData.longest);
+    const unlockedIds = storage.getUnlockedAchievements();
+    const newAchievements = checkNewAchievements(stats, unlockedIds);
+
+    if (newAchievements.length > 0) {
+      const achievement = newAchievements[0];
+      storage.unlockAchievement(achievement.id);
+      setNewAchievement(achievement);
+    }
   };
 
   if (!entry) return null;
 
   const dailyScore = calculateDailyScore(entry, template);
   const progressPercent = Math.round(dailyScore * 100);
+  const streakEmoji = getStreakEmoji(streak.current);
+  const streakMilestone = getStreakMilestone(streak.current);
+  const isStreakAtRisk = dailyScore < 0.7 && streak.current > 0;
 
   return (
     <div className="min-h-screen pb-20 bg-gray-50 dark:bg-gray-900">
+      {newAchievement && (
+        <AchievementNotification
+          emoji={newAchievement.emoji}
+          name={newAchievement.name}
+          description={newAchievement.description}
+          onClose={() => setNewAchievement(null)}
+        />
+      )}
+
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="bg-white dark:bg-gray-800 shadow-sm">
           <div className="p-6">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t.today.title}</h1>
+            <div className="flex items-center justify-between mb-2">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{t.today.title}</h1>
+              {streak.current > 0 && (
+                <div className="text-2xl">{streakEmoji}</div>
+              )}
+            </div>
             <p className="text-gray-600 dark:text-gray-400">{new Date().toLocaleDateString('ro-RO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+
+            {/* Streak Info */}
+            {streak.current > 0 && (
+              <div className="mt-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-3">
+                <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">
+                  Serie: {streak.current} zile la rând {streakEmoji}
+                </p>
+              </div>
+            )}
+
+            {/* Milestone Celebration */}
+            {streakMilestone && (
+              <div className="mt-2 bg-gradient-to-r from-amber-400 to-orange-500 rounded-lg p-3">
+                <p className="text-sm font-bold text-white text-center">
+                  🎉 {streakMilestone}
+                </p>
+              </div>
+            )}
+
+            {/* Streak At Risk Warning */}
+            {isStreakAtRisk && (
+              <div className="mt-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                <p className="text-sm font-semibold text-red-800 dark:text-red-300">
+                  ⚠️ Completează mai mult pentru a păstra seria!
+                </p>
+              </div>
+            )}
 
             {/* Progress Bar */}
             <div className="mt-4">

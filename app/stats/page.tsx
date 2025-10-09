@@ -6,13 +6,17 @@ import { Navigation } from '@/components/Navigation';
 import { storage } from '@/lib/storage';
 import { calculateCompletionRate, calculateSectionCompletionRate, calculateDailyScore } from '@/lib/utils';
 import { DailyEntry } from '@/lib/types';
+import { AchievementBadge } from '@/components/AchievementBadge';
+import { ACHIEVEMENTS } from '@/lib/achievements';
 
 export default function StatsPage() {
   const { t, streak, template } = useApp();
   const [entries, setEntries] = useState<DailyEntry[]>([]);
+  const [unlockedAchievements, setUnlockedAchievements] = useState<string[]>([]);
 
   const loadEntries = () => {
     setEntries(storage.getEntries());
+    setUnlockedAchievements(storage.getUnlockedAchievements());
   };
 
   useEffect(() => {
@@ -46,6 +50,25 @@ export default function StatsPage() {
         </div>
 
         <div className="p-4 space-y-4">
+          {/* Achievements */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+              🏆 Realizări ({unlockedAchievements.length}/{ACHIEVEMENTS.length})
+            </h2>
+            <div className="grid grid-cols-2 gap-4">
+              {ACHIEVEMENTS.map((achievement) => (
+                <AchievementBadge
+                  key={achievement.id}
+                  emoji={achievement.emoji}
+                  name={achievement.name}
+                  description={achievement.description}
+                  unlocked={unlockedAchievements.includes(achievement.id)}
+                  tier={achievement.tier}
+                />
+              ))}
+            </div>
+          </div>
+
           {/* Streaks */}
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl p-6 text-white shadow-lg">

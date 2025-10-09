@@ -42,4 +42,5 @@ export interface AppData {
   template: ChecklistTemplate;
   entries: DailyEntry[];
   streak: Streak;
+  unlockedAchievements: string[];
 }
