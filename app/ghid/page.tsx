@@ -34,7 +34,7 @@ export default function GhidPage() {
             <div className="space-y-2 text-gray-700 dark:text-gray-300">
               <p>• Suc → apă/ceai</p>
               <p>• Pâine albă → integrală</p>
-              <p>• Prăjit → cuptor</p>
+              <p>• Prăjit → cuptor sau abur (Airfryer)</p>
               <p>• Smântână/unt → ulei de măsline puțin</p>
               <p>• Desert → iaurt slab + fructe</p>
             </div>
@@ -43,7 +43,7 @@ export default function GhidPage() {
           {/* Etichetă */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
             <h2 className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mb-3">
-              Etichetă (evită dacă apare în top 3)
+              Evită
             </h2>
             <div className="space-y-2 text-gray-700 dark:text-gray-300">
               <p>• Zahăr/sirop</p>
@@ -71,17 +71,10 @@ export default function GhidPage() {
               <p>• <span className="font-semibold">Legume:</span> 1 porție = 1 cană crud / ½ cană gătit</p>
               <p>• <span className="font-semibold">Fructe:</span> 1 porție = 1 bucată mică</p>
               <p>• <span className="font-semibold">Integrale:</span> 1 porție = ½ cană gătit sau 1 felie pâine</p>
-              <p>• <span className="font-semibold">Nuci/semințe:</span> 30 g (in/chia măcinate – 1 lingură)</p>
+              <p>• <span className="font-semibold">Nuci/semințe:</span> 30 g (chia măcinată – 1 lingură)</p>
             </div>
           </div>
 
-          {/* Tip pentru fibre */}
-          <div className="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-6 text-white">
-            <h2 className="text-xl font-bold mb-2">💡 Tip pentru fibre</h2>
-            <p className="leading-relaxed">
-              Pune la micul dejun <span className="font-semibold">ovăz + 1 lingură semințe de in măcinate</span>
-            </p>
-          </div>
         </div>
       </div>
 

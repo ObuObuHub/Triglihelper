@@ -43,7 +43,7 @@ export const DEFAULT_TEMPLATE: ChecklistTemplate = {
         },
         {
           id: 'd3',
-          label: 'Fără prăjeli/margarină; gătesc la cuptor/abur',
+          label: 'Fără prăjeli/margarină; gătesc la cuptor sau abur (Airfryer)',
           required: true,
         },
         {
@@ -63,21 +63,26 @@ export const DEFAULT_TEMPLATE: ChecklistTemplate = {
         },
         {
           id: 'd7',
-          label: '≥1 porție sau pește azi/săptămâna asta',
+          label: '≥1 porție pește azi sau săptămâna asta',
           required: true,
         },
         {
           id: 'd8',
-          label: 'Apă ≥1,5 L | Fibre ≥25 g',
+          label: 'Apă ≥1,5 L',
           required: true,
         },
         {
           id: 'd9',
+          label: 'Fibre ≥25 g',
+          required: true,
+        },
+        {
+          id: 'd10',
           label: 'Alcool: 0',
           required: true,
         },
       ],
-      minRequired: 7,
+      minRequired: 8,
     },
     {
       name: 'Medicație',
