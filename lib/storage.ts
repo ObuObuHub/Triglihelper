@@ -13,10 +13,14 @@ export const storage = {
 
     try {
       const data = localStorage.getItem(STORAGE_KEY);
+      console.log('[Storage] getData - raw localStorage:', data ? 'exists' : 'null');
       if (!data) {
+        console.log('[Storage] getData - returning default data');
         return this.getDefaultData();
       }
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      console.log('[Storage] getData - entries count:', parsed.entries?.length || 0);
+      return parsed;
     } catch (error) {
       console.error('Error reading from localStorage:', error);
       return this.getDefaultData();
@@ -27,7 +31,9 @@ export const storage = {
     if (typeof window === 'undefined') return;
 
     try {
+      console.log('[Storage] saveData - saving entries count:', data.entries?.length || 0);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      console.log('[Storage] saveData - saved successfully');
     } catch (error) {
       console.error('Error saving to localStorage:', error);
     }
@@ -86,12 +92,15 @@ export const storage = {
   },
 
   saveEntry(entry: DailyEntry): void {
+    console.log('[Storage] saveEntry - date:', entry.date, 'sections:', entry.sections.length);
     const data = this.getData();
     const existingIndex = data.entries.findIndex((e) => e.date === entry.date);
 
     if (existingIndex >= 0) {
+      console.log('[Storage] saveEntry - updating existing entry at index:', existingIndex);
       data.entries[existingIndex] = entry;
     } else {
+      console.log('[Storage] saveEntry - adding new entry');
       data.entries.push(entry);
     }
 
@@ -102,6 +111,7 @@ export const storage = {
     this.saveData(data);
 
     // Sync to cloud
+    console.log('[Storage] saveEntry - syncing to cloud');
     cloudStorage.syncEntry(entry).catch(console.error);
   },
 
