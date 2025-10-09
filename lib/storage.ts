@@ -128,8 +128,22 @@ export const storage = {
       }
 
       if (cloudEntries && cloudEntries.length > 0) {
-        data.entries = cloudEntries;
-        data.streak = this.calculateStreak(cloudEntries);
+        // Merge cloud and local entries (keep both, prefer local for conflicts)
+        const localEntriesMap = new Map(data.entries.map(e => [e.date, e]));
+
+        cloudEntries.forEach(cloudEntry => {
+          const localEntry = localEntriesMap.get(cloudEntry.date);
+
+          if (!localEntry) {
+            // Cloud has an entry we don't have locally - add it
+            localEntriesMap.set(cloudEntry.date, cloudEntry);
+          }
+          // If we have a local entry, keep it (local changes take precedence)
+        });
+
+        data.entries = Array.from(localEntriesMap.values())
+          .sort((a, b) => b.date.localeCompare(a.date));
+        data.streak = this.calculateStreak(data.entries);
       }
 
       this.saveData(data);
