@@ -33,7 +33,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const t = useTranslation();
 
   useEffect(() => {
-    refreshData();
+    const initializeData = async () => {
+      // First load from localStorage for fast initial display
+      refreshData();
+
+      // Then sync from Supabase to get latest data
+      if (isSupabaseEnabled) {
+        try {
+          await storage.syncFromCloud();
+          refreshData(); // Refresh UI with Supabase data
+        } catch (error) {
+          console.error('Failed to sync from cloud on startup:', error);
+        }
+      }
+    };
+
+    initializeData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -49,23 +64,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const today = new Date().toISOString().split('T')[0];
     const entry = storage.getEntry(today);
     setTodayEntry(entry || null);
-  };
-
-  const syncFromCloud = async () => {
-    if (!isSupabaseEnabled) return;
-
-    try {
-      setSyncStatus({ isSyncing: true });
-      await storage.syncFromCloud();
-      refreshData();
-      setSyncStatus({ isSyncing: false, lastSyncedAt: new Date() });
-    } catch (error) {
-      console.error('Sync error:', error);
-      setSyncStatus({
-        isSyncing: false,
-        error: error instanceof Error ? error.message : 'Sync failed',
-      });
-    }
   };
 
   const updateUser = (newUser: User) => {
