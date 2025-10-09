@@ -23,34 +23,6 @@ export default function SettingsPage() {
     window.location.reload();
   };
 
-  const handleExport = () => {
-    const data = storage.getData();
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `triglycoach-${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const data = JSON.parse(reader.result as string);
-        storage.saveData(data);
-        window.location.reload();
-      } catch {
-        alert('Fișier invalid');
-      }
-    };
-    reader.readAsText(file);
-  };
-
   return (
     <div className="min-h-screen pb-20 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-md mx-auto">
@@ -110,31 +82,6 @@ export default function SettingsPage() {
                 {t.settings.save}
               </button>
             </div>
-          </div>
-
-          {/* Export/Import Data */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Exportă/Importă Date</h2>
-            <div className="flex gap-3">
-              <button
-                onClick={handleExport}
-                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
-              >
-                Exportă JSON
-              </button>
-              <label className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors cursor-pointer text-center">
-                Importă JSON
-                <input
-                  type="file"
-                  accept="application/json"
-                  className="hidden"
-                  onChange={handleImport}
-                />
-              </label>
-            </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-              Exportă pentru backup sau importă date salvate anterior.
-            </p>
           </div>
 
           {/* Clear Data */}
