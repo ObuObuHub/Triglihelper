@@ -68,7 +68,7 @@ export const DEFAULT_TEMPLATE: ChecklistTemplate = {
         },
         {
           id: 'd7',
-          label: 'Leguminoase ≥1 porție sau pește gras azi/săptămâna asta',
+          label: '≥1 porție sau pește azi/săptămâna asta',
           required: true,
         },
         {
