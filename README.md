@@ -90,10 +90,6 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 2. Activează **Email**
 3. (Opțional) Configurează SMTP custom pentru email-uri branded
 
-**Gata!** Acum utilizatorii pot:
-- Sign in cu email (magic link)
-- Sincroniza datele automat între dispozitive
-- Accesa datele de pe telefon, laptop, tabletă
 
 ## 📦 Deployment pe Vercel
 
@@ -227,11 +223,8 @@ triglycoach/
 - Total zile înregistrate
 
 ### Setări
-- Profil (nume)
-- Schimbare limbă (RO/EN)
 - **Cloud Sync** - Sign in/out, sincronizare manuală
 - Șterge toate datele
-- Vizualizare disclaimer medical
 
 ### Cloud Sync
 - **Magic Link Authentication** - Sign in fără parolă
