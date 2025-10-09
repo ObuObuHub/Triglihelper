@@ -34,21 +34,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     refreshData();
-
-    // Auto-sync on mount (bidirectional)
-    if (isSupabaseEnabled) {
-      const initialSync = async () => {
-        try {
-          // Push local data to cloud first
-          await storage.syncToCloud();
-          // Then pull from cloud
-          await syncFromCloud();
-        } catch (error) {
-          console.error('Initial sync error:', error);
-        }
-      };
-      initialSync();
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -8,16 +8,16 @@ import { DailyEntry } from '@/lib/types';
 
 export default function TodayPage() {
   const { template, todayEntry, updateTodayEntry, t } = useApp();
-  const [entry, setEntry] = useState<DailyEntry | null>(todayEntry);
+  const [entry, setEntry] = useState<DailyEntry | null>(null);
 
   useEffect(() => {
-    const today = getTodayDateString();
-    if (!todayEntry) {
+    if (todayEntry) {
+      setEntry(todayEntry);
+    } else {
+      const today = getTodayDateString();
       const newEntry = createEmptyEntry(today, template);
       setEntry(newEntry);
       updateTodayEntry(newEntry);
-    } else {
-      setEntry(todayEntry);
     }
   }, [todayEntry, template, updateTodayEntry]);
 
