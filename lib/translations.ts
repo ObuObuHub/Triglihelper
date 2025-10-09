@@ -7,6 +7,7 @@ export const translations = {
     today: 'Astăzi',
     calendar: 'Calendar',
     stats: 'Statistici',
+    guide: 'Ghid',
     settings: 'Setări',
   },
   today: {

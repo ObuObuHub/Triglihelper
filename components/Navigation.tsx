@@ -13,6 +13,7 @@ export function Navigation() {
     { path: '/', label: t.nav.today, icon: '📋' },
     { path: '/calendar', label: t.nav.calendar, icon: '📅' },
     { path: '/stats', label: t.nav.stats, icon: '📊' },
+    { path: '/ghid', label: t.nav.guide, icon: '📖' },
     { path: '/settings', label: t.nav.settings, icon: '⚙️' },
   ];
 
