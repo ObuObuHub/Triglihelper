@@ -35,9 +35,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     refreshData();
 
-    // Auto-sync from cloud on mount
+    // Auto-sync on mount (bidirectional)
     if (isSupabaseEnabled) {
-      syncFromCloud();
+      const initialSync = async () => {
+        try {
+          // Push local data to cloud first
+          await storage.syncToCloud();
+          // Then pull from cloud
+          await syncFromCloud();
+        } catch (error) {
+          console.error('Initial sync error:', error);
+        }
+      };
+      initialSync();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -90,7 +100,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const syncNow = async () => {
-    await syncFromCloud();
+    if (!isSupabaseEnabled) return;
+
+    try {
+      setSyncStatus({ isSyncing: true });
+
+      // First push local data to cloud
+      await storage.syncToCloud();
+
+      // Then pull from cloud (in case there are updates from other devices)
+      await storage.syncFromCloud();
+
+      refreshData();
+      setSyncStatus({ isSyncing: false, lastSyncedAt: new Date() });
+    } catch (error) {
+      console.error('Sync error:', error);
+      setSyncStatus({
+        isSyncing: false,
+        error: error instanceof Error ? error.message : 'Sync failed',
+      });
+    }
   };
 
   return (
