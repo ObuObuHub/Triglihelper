@@ -12,8 +12,27 @@ export default function CalendarPage() {
   const [entries, setEntries] = useState<DailyEntry[]>([]);
   const [selectedEntry, setSelectedEntry] = useState<DailyEntry | null>(null);
 
-  useEffect(() => {
+  const loadEntries = () => {
     setEntries(storage.getEntries());
+  };
+
+  useEffect(() => {
+    loadEntries();
+
+    // Reload entries when window/tab becomes visible
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        loadEntries();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', loadEntries);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', loadEntries);
+    };
   }, []);
 
   const getDaysInMonth = (date: Date) => {

@@ -11,8 +11,27 @@ export default function StatsPage() {
   const { t, streak, template } = useApp();
   const [entries, setEntries] = useState<DailyEntry[]>([]);
 
-  useEffect(() => {
+  const loadEntries = () => {
     setEntries(storage.getEntries());
+  };
+
+  useEffect(() => {
+    loadEntries();
+
+    // Reload entries when window/tab becomes visible
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        loadEntries();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', loadEntries);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', loadEntries);
+    };
   }, []);
 
   const last7DaysRate = calculateCompletionRate(entries, 7);
