@@ -17,9 +17,8 @@ export default function TodayPage() {
       const today = getTodayDateString();
       const newEntry = createEmptyEntry(today, template);
       setEntry(newEntry);
-      updateTodayEntry(newEntry);
     }
-  }, [todayEntry, template, updateTodayEntry]);
+  }, [todayEntry, template]);
 
   const handleToggleItem = (sectionName: string, itemId: string) => {
     if (!entry) return;
@@ -35,7 +34,6 @@ export default function TodayPage() {
     item.timestamp = item.checked ? new Date().toISOString() : undefined;
 
     section.sectionComplete = checkSectionComplete(section, template);
-
     newEntry.dayComplete = checkDayComplete(newEntry, template);
 
     setEntry(newEntry);
