@@ -38,66 +38,51 @@ export const DEFAULT_TEMPLATE: ChecklistTemplate = {
       items: [
         {
           id: 'd1',
-          label: 'Zi fără alcool',
+          label: 'Fără băuturi dulci și dulciuri',
           required: true,
         },
         {
           id: 'd2',
-          label: 'Zero băuturi îndulcite/sucuri',
+          label: 'Fără făină/orez alb (doar integrale)',
           required: true,
         },
         {
           id: 'd3',
-          label: 'Zero făină/orez alb, dulciuri',
+          label: 'Fără prăjeli/margarină; gătesc la cuptor/abur',
           required: true,
         },
         {
           id: 'd4',
-          label: '≥4 porții legume',
+          label: 'Ulei puțin și bun (măsline/rapiță)',
           required: true,
         },
         {
           id: 'd5',
-          label: 'Fructe întregi ≤2 porții',
+          label: 'Legume ≥4 porții (½ farfurie)',
           required: true,
         },
         {
           id: 'd6',
-          label: 'Leguminoase ≥1 porție',
+          label: 'Fructe 1–2 porții (nu suc)',
           required: true,
         },
         {
           id: 'd7',
-          label: 'Cereale integrale ≥3 porții',
+          label: 'Leguminoase ≥1 porție sau pește gras azi/săptămâna asta',
           required: true,
         },
         {
           id: 'd8',
-          label: 'Nuci/semințe ≥1 porție',
+          label: 'Apă ≥1,5 L | Fibre ≥25 g',
           required: true,
         },
         {
           id: 'd9',
-          label: 'Pește gras (astăzi sau programat)',
-          required: true,
-        },
-        {
-          id: 'd10',
-          label: 'Gătit sănătos (cuptor/abur/grătar)',
-          required: true,
-        },
-        {
-          id: 'd11',
-          label: 'Fibre ≥25g',
-          required: true,
-        },
-        {
-          id: 'd12',
-          label: 'Apă ≥1.5L',
+          label: 'Alcool: 0',
           required: true,
         },
       ],
-      minRequired: 9,
+      minRequired: 7,
     },
     {
       name: 'Medicație',
