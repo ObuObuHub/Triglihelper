@@ -109,7 +109,7 @@ export default function StatsPage() {
                     <div
                       key={entry.date}
                       className={`px-3 py-2 rounded-xl text-sm border ${
-                        score >= 0.8
+                        score >= 0.7
                           ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-300 dark:border-emerald-700'
                           : score >= 0.5
                           ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-300 dark:border-amber-700'

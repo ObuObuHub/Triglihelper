@@ -85,7 +85,7 @@ export const storage = {
 
     const template = this.getTemplate();
     const completedEntries = entries
-      .filter((e) => calculateDailyScore(e, template) >= 0.8)
+      .filter((e) => calculateDailyScore(e, template) >= 0.7)
       .sort((a, b) => b.date.localeCompare(a.date));
 
     if (completedEntries.length === 0) {

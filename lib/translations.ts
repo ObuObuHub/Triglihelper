@@ -15,7 +15,7 @@ export const translations = {
     complete: 'Finalizează Ziua',
     completeDay: 'Finalizează ziua!',
     progressLabel: 'Progres zilnic',
-    allDone: 'Totul făcut pentru astăzi! 🎉',
+    allDone: 'BRAVO, TEO !!! 🎉',
   },
   sections: {
     activity: 'Activitate',

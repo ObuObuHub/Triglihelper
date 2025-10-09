@@ -51,7 +51,7 @@ export function calculateDailyScore(entry: DailyEntry, template: ChecklistTempla
 
 export function checkDayComplete(entry: DailyEntry, template: ChecklistTemplate): boolean {
   const score = calculateDailyScore(entry, template);
-  return score >= 0.8; // 80% threshold
+  return score >= 0.7; // 70% threshold
 }
 
 export function calculateCompletionRate(entries: DailyEntry[], days: number): number {

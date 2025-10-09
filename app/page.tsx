@@ -67,7 +67,7 @@ export default function TodayPage() {
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
                 <div
                   className={`h-full transition-all duration-500 ease-out rounded-full ${
-                    progressPercent >= 80 ? 'bg-emerald-500' : progressPercent >= 50 ? 'bg-amber-500' : 'bg-red-500'
+                    progressPercent >= 70 ? 'bg-emerald-500' : progressPercent >= 50 ? 'bg-amber-500' : 'bg-red-500'
                   }`}
                   style={{ width: `${progressPercent}%` }}
                 />
