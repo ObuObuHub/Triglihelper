@@ -1,9 +1,4 @@
-import { ChecklistTemplate, User, TargetConfig } from './types';
-
-export const DEFAULT_TARGETS: TargetConfig = {
-  fiber: 25, // grams
-  water: 1.5, // liters
-};
+import { ChecklistTemplate, User } from './types';
 
 export const DEFAULT_TEMPLATE: ChecklistTemplate = {
   sections: [

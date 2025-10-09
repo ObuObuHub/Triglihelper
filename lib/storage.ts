@@ -13,14 +13,10 @@ export const storage = {
 
     try {
       const data = localStorage.getItem(STORAGE_KEY);
-      console.log('[Storage] getData - raw localStorage:', data ? 'exists' : 'null');
       if (!data) {
-        console.log('[Storage] getData - returning default data');
         return this.getDefaultData();
       }
-      const parsed = JSON.parse(data);
-      console.log('[Storage] getData - entries count:', parsed.entries?.length || 0);
-      return parsed;
+      return JSON.parse(data);
     } catch (error) {
       console.error('Error reading from localStorage:', error);
       return this.getDefaultData();
@@ -31,9 +27,7 @@ export const storage = {
     if (typeof window === 'undefined') return;
 
     try {
-      console.log('[Storage] saveData - saving entries count:', data.entries?.length || 0);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      console.log('[Storage] saveData - saved successfully');
     } catch (error) {
       console.error('Error saving to localStorage:', error);
     }
@@ -92,26 +86,20 @@ export const storage = {
   },
 
   saveEntry(entry: DailyEntry): void {
-    console.log('[Storage] saveEntry - date:', entry.date, 'sections:', entry.sections.length);
     const data = this.getData();
     const existingIndex = data.entries.findIndex((e) => e.date === entry.date);
 
     if (existingIndex >= 0) {
-      console.log('[Storage] saveEntry - updating existing entry at index:', existingIndex);
       data.entries[existingIndex] = entry;
     } else {
-      console.log('[Storage] saveEntry - adding new entry');
       data.entries.push(entry);
     }
 
     data.entries.sort((a, b) => b.date.localeCompare(a.date));
-
     data.streak = this.calculateStreak(data.entries);
-
     this.saveData(data);
 
     // Sync to cloud
-    console.log('[Storage] saveEntry - syncing to cloud');
     cloudStorage.syncEntry(entry).catch(console.error);
   },
 
@@ -186,78 +174,54 @@ export const storage = {
     }
 
     const template = this.getTemplate();
-
-    const sortedEntries = [...entries]
-      .filter((e) => calculateDailyScore(e, template) >= 0.8) // 80% threshold
+    const completedEntries = entries
+      .filter((e) => calculateDailyScore(e, template) >= 0.8)
       .sort((a, b) => b.date.localeCompare(a.date));
 
-    if (sortedEntries.length === 0) {
+    if (completedEntries.length === 0) {
       return { current: 0, longest: 0 };
     }
 
-    let current = 0;
-    let longest = 0;
-    let tempStreak = 0;
-
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
 
-    const latestEntry = new Date(sortedEntries[0].date);
-    latestEntry.setHours(0, 0, 0, 0);
+    let current = 0;
+    let longest = 0;
+    let tempStreak = 1;
 
-    if (latestEntry.getTime() === today.getTime() || latestEntry.getTime() === yesterday.getTime()) {
+    // Check if we have a current streak
+    const latestDate = new Date(completedEntries[0].date);
+    latestDate.setHours(0, 0, 0, 0);
+    const isCurrentStreak = latestDate.getTime() === today.getTime() ||
+                           latestDate.getTime() === yesterday.getTime();
+
+    if (isCurrentStreak) {
       current = 1;
-      tempStreak = 1;
+    }
 
-      for (let i = 1; i < sortedEntries.length; i++) {
-        const currentDate = new Date(sortedEntries[i - 1].date);
-        const prevDate = new Date(sortedEntries[i].date);
-        currentDate.setHours(0, 0, 0, 0);
-        prevDate.setHours(0, 0, 0, 0);
+    // Calculate streaks
+    for (let i = 1; i < completedEntries.length; i++) {
+      const prevDate = new Date(completedEntries[i - 1].date);
+      const currDate = new Date(completedEntries[i].date);
+      prevDate.setHours(0, 0, 0, 0);
+      currDate.setHours(0, 0, 0, 0);
 
-        const diffTime = currentDate.getTime() - prevDate.getTime();
-        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+      const daysDiff = Math.round((prevDate.getTime() - currDate.getTime()) / (1000 * 60 * 60 * 24));
 
-        if (diffDays === 1) {
-          if (i < sortedEntries.length && latestEntry.getTime() >= prevDate.getTime()) {
-            current++;
-          }
-          tempStreak++;
-        } else {
-          if (tempStreak > longest) {
-            longest = tempStreak;
-          }
-          tempStreak = 1;
+      if (daysDiff === 1) {
+        tempStreak++;
+        if (isCurrentStreak && i < completedEntries.length) {
+          current++;
         }
-      }
-    } else {
-      for (let i = 1; i < sortedEntries.length; i++) {
-        const currentDate = new Date(sortedEntries[i - 1].date);
-        const prevDate = new Date(sortedEntries[i].date);
-        currentDate.setHours(0, 0, 0, 0);
-        prevDate.setHours(0, 0, 0, 0);
-
-        const diffTime = currentDate.getTime() - prevDate.getTime();
-        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-
-        if (diffDays === 1) {
-          tempStreak++;
-        } else {
-          if (tempStreak > longest) {
-            longest = tempStreak;
-          }
-          tempStreak = 1;
-        }
+      } else {
+        longest = Math.max(longest, tempStreak);
+        tempStreak = 1;
       }
     }
 
-    if (tempStreak > longest) {
-      longest = tempStreak;
-    }
-
+    longest = Math.max(longest, tempStreak);
     return { current, longest };
   },
 

@@ -26,17 +26,10 @@ export interface DailySection {
   sectionComplete: boolean;
 }
 
-export interface NumericTarget {
-  value: number;
-  target: number;
-}
-
 export interface DailyEntry {
   date: string;
   sections: DailySection[];
   dayComplete: boolean;
-  fiber?: NumericTarget;
-  water?: NumericTarget;
   notes?: string;
 }
 
@@ -62,15 +55,9 @@ export interface SyncStatus {
   error?: string;
 }
 
-export interface TargetConfig {
-  fiber: number;
-  water: number;
-}
-
 export interface AppData {
   user: User;
   template: ChecklistTemplate;
   entries: DailyEntry[];
   streak: Streak;
-  targets?: TargetConfig;
 }

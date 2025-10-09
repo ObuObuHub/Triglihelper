@@ -60,7 +60,7 @@ export default function TodayPage() {
             <div className="mt-4">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Progres zilnic
+                  {t.today.progressLabel}
                 </span>
                 <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
                   {progressPercent}%

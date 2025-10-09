@@ -78,9 +78,9 @@ export default function StatsPage() {
 
           {/* 14-Day History */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Ultimele 14 zile</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t.stats.last14Days}</h2>
             {entries.length === 0 ? (
-              <p className="text-sm text-gray-500 dark:text-gray-400">Istoricul se va popula pe măsură ce închei zile.</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{t.stats.noHistory}</p>
             ) : (
               <div className="flex flex-wrap gap-2">
                 {entries.slice(0, 14).map((entry) => {
@@ -181,7 +181,7 @@ export default function StatsPage() {
           {/* Total Entries */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 text-center">
             <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">{entries.length}</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Zile înregistrate</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">{t.stats.totalDaysRecorded}</div>
           </div>
         </div>
       </div>

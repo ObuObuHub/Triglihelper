@@ -1,13 +1,15 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 import { AuthUser } from './types';
 
+const isEnabled = () => isSupabaseConfigured() && supabase;
+
 export const auth = {
   async signInWithEmail(email: string): Promise<{ error?: string }> {
-    if (!isSupabaseConfigured() || !supabase) {
+    if (!isEnabled()) {
       return { error: 'Supabase not configured' };
     }
 
-    const { error } = await supabase.auth.signInWithOtp({
+    const { error } = await supabase!.auth.signInWithOtp({
       email,
       options: {
         emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
@@ -22,16 +24,16 @@ export const auth = {
   },
 
   async signOut(): Promise<void> {
-    if (!isSupabaseConfigured() || !supabase) return;
-    await supabase.auth.signOut();
+    if (!isEnabled()) return;
+    await supabase!.auth.signOut();
   },
 
   async getCurrentUser(): Promise<AuthUser | null> {
-    if (!isSupabaseConfigured() || !supabase) return null;
+    if (!isEnabled()) return null;
 
     const {
       data: { user },
-    } = await supabase.auth.getUser();
+    } = await supabase!.auth.getUser();
 
     if (!user) return null;
 
@@ -42,14 +44,14 @@ export const auth = {
   },
 
   onAuthStateChange(callback: (user: AuthUser | null) => void) {
-    if (!isSupabaseConfigured() || !supabase) {
+    if (!isEnabled()) {
       callback(null);
       return () => {};
     }
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase!.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         callback({
           id: session.user.id,

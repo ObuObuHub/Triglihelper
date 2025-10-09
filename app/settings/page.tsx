@@ -15,7 +15,7 @@ export default function SettingsPage() {
       ...user,
       name,
     });
-    alert('Salvat!');
+    alert(t.settings.saved);
   };
 
   const handleClearData = async () => {
@@ -36,13 +36,13 @@ export default function SettingsPage() {
           {isSupabaseEnabled && (
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                Sincronizare Cloud
+                {t.settings.cloudSync}
               </h2>
 
               <div className="space-y-4">
                 {syncStatus.lastSyncedAt && (
                   <div className="text-xs text-gray-600 dark:text-gray-400 text-center">
-                    Ultima sincronizare: {new Date(syncStatus.lastSyncedAt).toLocaleTimeString('ro-RO')}
+                    {t.settings.lastSynced}: {new Date(syncStatus.lastSyncedAt).toLocaleTimeString('ro-RO')}
                   </div>
                 )}
 
@@ -51,7 +51,7 @@ export default function SettingsPage() {
                   disabled={syncStatus.isSyncing}
                   className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
                 >
-                  {syncStatus.isSyncing ? 'Sincronizare...' : 'Sincronizează Acum'}
+                  {syncStatus.isSyncing ? t.settings.syncing : t.settings.syncNow}
                 </button>
               </div>
             </div>
@@ -96,9 +96,9 @@ export default function SettingsPage() {
 
           {/* App Info */}
           <div className="text-center text-sm text-gray-500 dark:text-gray-400 py-4">
-            TriglyCoach v2.0.0
+            {t.settings.appVersion}
             <br />
-            Făcut cu ❤️
+            {t.settings.madeWith}
           </div>
         </div>
       </div>
@@ -108,7 +108,7 @@ export default function SettingsPage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
             <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-              Confirmare
+              {t.settings.confirmTitle}
             </h2>
             <p className="text-gray-700 dark:text-gray-300 mb-6">{t.settings.clearConfirm}</p>
             <div className="flex gap-3">
@@ -122,7 +122,7 @@ export default function SettingsPage() {
                 onClick={handleClearData}
                 className="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
               >
-                Șterge
+                {t.settings.deleteButton}
               </button>
             </div>
           </div>

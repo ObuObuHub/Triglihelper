@@ -14,7 +14,7 @@ export const translations = {
     title: 'Astăzi',
     complete: 'Finalizează Ziua',
     completeDay: 'Finalizează ziua!',
-    progressLabel: 'secțiuni complete',
+    progressLabel: 'Progres zilnic',
     allDone: 'Totul făcut pentru astăzi! 🎉',
   },
   sections: {
@@ -36,8 +36,11 @@ export const translations = {
     days: 'zile',
     last7Days: 'Ultimele 7 Zile',
     last30Days: 'Ultimele 30 Zile',
+    last14Days: 'Ultimele 14 zile',
     completionRate: 'Rată de Finalizare',
     sectionCompletion: 'Finalizare Secțiuni',
+    noHistory: 'Istoricul se va popula pe măsură ce închei zile.',
+    totalDaysRecorded: 'Zile înregistrate',
   },
   settings: {
     title: 'Setări',
@@ -70,6 +73,11 @@ export const translations = {
     lastSynced: 'Ultima sincronizare',
     notSynced: 'Nu sincronizat',
     syncing: 'Se sincronizează...',
+    saved: 'Salvat!',
+    confirmTitle: 'Confirmare',
+    deleteButton: 'Șterge',
+    appVersion: 'TriglyCoach v2.0.0',
+    madeWith: 'Făcut cu ❤️',
   },
   disclaimer: {
     title: 'Disclaimer Medical',

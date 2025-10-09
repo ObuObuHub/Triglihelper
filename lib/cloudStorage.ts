@@ -3,11 +3,13 @@ import { User, ChecklistTemplate, DailyEntry } from './types';
 
 const FIXED_USER_ID = 'fixed-user-id';
 
+const isEnabled = () => isSupabaseConfigured() && supabase;
+
 export const cloudStorage = {
   async syncUser(user: User): Promise<void> {
-    if (!isSupabaseConfigured() || !supabase) return;
+    if (!isEnabled()) return;
 
-    await supabase.from('profiles').upsert({
+    await supabase!.from('profiles').upsert({
       id: FIXED_USER_ID,
       name: user.name,
       reminder_times: user.reminderTimes,
@@ -15,9 +17,9 @@ export const cloudStorage = {
   },
 
   async getUser(): Promise<User | null> {
-    if (!isSupabaseConfigured() || !supabase) return null;
+    if (!isEnabled()) return null;
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('profiles')
       .select('*')
       .eq('id', FIXED_USER_ID)
@@ -33,18 +35,18 @@ export const cloudStorage = {
   },
 
   async syncTemplate(template: ChecklistTemplate): Promise<void> {
-    if (!isSupabaseConfigured() || !supabase) return;
+    if (!isEnabled()) return;
 
-    await supabase.from('checklist_templates').upsert({
+    await supabase!.from('checklist_templates').upsert({
       user_id: FIXED_USER_ID,
       sections: template.sections,
     });
   },
 
   async getTemplate(): Promise<ChecklistTemplate | null> {
-    if (!isSupabaseConfigured() || !supabase) return null;
+    if (!isEnabled()) return null;
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('checklist_templates')
       .select('*')
       .eq('user_id', FIXED_USER_ID)
@@ -58,9 +60,9 @@ export const cloudStorage = {
   },
 
   async syncEntry(entry: DailyEntry): Promise<void> {
-    if (!isSupabaseConfigured() || !supabase) return;
+    if (!isEnabled()) return;
 
-    await supabase.from('daily_entries').upsert({
+    await supabase!.from('daily_entries').upsert({
       user_id: FIXED_USER_ID,
       date: entry.date,
       sections: entry.sections,
@@ -69,9 +71,9 @@ export const cloudStorage = {
   },
 
   async getEntries(): Promise<DailyEntry[]> {
-    if (!isSupabaseConfigured() || !supabase) return [];
+    if (!isEnabled()) return [];
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('daily_entries')
       .select('*')
       .eq('user_id', FIXED_USER_ID)
@@ -87,9 +89,9 @@ export const cloudStorage = {
   },
 
   async getEntry(date: string): Promise<DailyEntry | null> {
-    if (!isSupabaseConfigured() || !supabase) return null;
+    if (!isEnabled()) return null;
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from('daily_entries')
       .select('*')
       .eq('user_id', FIXED_USER_ID)
@@ -106,11 +108,11 @@ export const cloudStorage = {
   },
 
   async deleteAllData(): Promise<void> {
-    if (!isSupabaseConfigured() || !supabase) return;
+    if (!isEnabled()) return;
 
     await Promise.all([
-      supabase.from('daily_entries').delete().eq('user_id', FIXED_USER_ID),
-      supabase.from('checklist_templates').delete().eq('user_id', FIXED_USER_ID),
+      supabase!.from('daily_entries').delete().eq('user_id', FIXED_USER_ID),
+      supabase!.from('checklist_templates').delete().eq('user_id', FIXED_USER_ID),
     ]);
   },
 };
