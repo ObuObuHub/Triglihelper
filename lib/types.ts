@@ -38,25 +38,7 @@ export interface Streak {
   longest: number;
 }
 
-export interface User {
-  id: string;
-  name: string;
-  reminderTimes: string[];
-}
-
-export interface AuthUser {
-  id: string;
-  email: string;
-}
-
-export interface SyncStatus {
-  isSyncing: boolean;
-  lastSyncedAt?: Date;
-  error?: string;
-}
-
 export interface AppData {
-  user: User;
   template: ChecklistTemplate;
   entries: DailyEntry[];
   streak: Streak;

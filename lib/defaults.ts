@@ -1,4 +1,4 @@
-import { ChecklistTemplate, User } from './types';
+import { ChecklistTemplate } from './types';
 
 export const DEFAULT_TEMPLATE: ChecklistTemplate = {
   sections: [
@@ -91,10 +91,4 @@ export const DEFAULT_TEMPLATE: ChecklistTemplate = {
       minRequired: 1,
     },
   ],
-};
-
-export const DEFAULT_USER: User = {
-  id: 'user-1',
-  name: '',
-  reminderTimes: ['08:00', '13:00', '20:00'],
 };

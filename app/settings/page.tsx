@@ -6,20 +6,11 @@ import { Navigation } from '@/components/Navigation';
 import { storage } from '@/lib/storage';
 
 export default function SettingsPage() {
-  const { t, user, updateUser, syncNow, syncStatus, isSupabaseEnabled } = useApp();
-  const [name, setName] = useState(user.name);
+  const { t } = useApp();
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
-  const handleSave = () => {
-    updateUser({
-      ...user,
-      name,
-    });
-    alert(t.settings.saved);
-  };
-
-  const handleClearData = async () => {
-    await storage.clearData();
+  const handleClearData = () => {
+    storage.clearData();
     window.location.reload();
   };
 
@@ -32,58 +23,6 @@ export default function SettingsPage() {
         </div>
 
         <div className="p-4 space-y-4">
-          {/* Cloud Sync Section */}
-          {isSupabaseEnabled && (
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                {t.settings.cloudSync}
-              </h2>
-
-              <div className="space-y-4">
-                {syncStatus.lastSyncedAt && (
-                  <div className="text-xs text-gray-600 dark:text-gray-400 text-center">
-                    {t.settings.lastSynced}: {new Date(syncStatus.lastSyncedAt).toLocaleTimeString('ro-RO')}
-                  </div>
-                )}
-
-                <button
-                  onClick={syncNow}
-                  disabled={syncStatus.isSyncing}
-                  className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
-                >
-                  {syncStatus.isSyncing ? t.settings.syncing : t.settings.syncNow}
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Profile */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t.settings.profile}</h2>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t.settings.name}
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  placeholder="Numele tău"
-                />
-              </div>
-
-              <button
-                onClick={handleSave}
-                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors"
-              >
-                {t.settings.save}
-              </button>
-            </div>
-          </div>
-
           {/* Clear Data */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
             <button
