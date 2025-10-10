@@ -98,21 +98,38 @@ export const storage = {
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
 
+    // Calculate current streak (from today/yesterday backwards)
     let current = 0;
-    let longest = 0;
-    let tempStreak = 1;
-
-    // Check if we have a current streak
     const latestDate = new Date(completedEntries[0].date);
     latestDate.setHours(0, 0, 0, 0);
+
+    // Only count as current streak if starts from today or yesterday
     const isCurrentStreak = latestDate.getTime() === today.getTime() ||
                            latestDate.getTime() === yesterday.getTime();
 
     if (isCurrentStreak) {
       current = 1;
+      // Count consecutive days backwards from the start
+      for (let i = 1; i < completedEntries.length; i++) {
+        const prevDate = new Date(completedEntries[i - 1].date);
+        const currDate = new Date(completedEntries[i].date);
+        prevDate.setHours(0, 0, 0, 0);
+        currDate.setHours(0, 0, 0, 0);
+
+        const daysDiff = Math.round((prevDate.getTime() - currDate.getTime()) / (1000 * 60 * 60 * 24));
+
+        if (daysDiff === 1) {
+          current++;
+        } else {
+          break; // Stop at first gap
+        }
+      }
     }
 
-    // Calculate streaks
+    // Calculate longest streak in entire history
+    let longest = 0;
+    let tempStreak = 1;
+
     for (let i = 1; i < completedEntries.length; i++) {
       const prevDate = new Date(completedEntries[i - 1].date);
       const currDate = new Date(completedEntries[i].date);
@@ -123,16 +140,13 @@ export const storage = {
 
       if (daysDiff === 1) {
         tempStreak++;
-        if (isCurrentStreak && i < completedEntries.length) {
-          current++;
-        }
       } else {
         longest = Math.max(longest, tempStreak);
         tempStreak = 1;
       }
     }
 
-    longest = Math.max(longest, tempStreak);
+    longest = Math.max(longest, tempStreak, current);
     return { current, longest };
   },
 
